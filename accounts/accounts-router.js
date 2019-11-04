@@ -1,7 +1,7 @@
 const express = require("express");
 
 // database access using knex
-const db = require("../data/db-config.js");
+const db = require("../data/dbConfig");
 
 const router = express.Router();
 
@@ -39,3 +39,36 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "this went wrong: " + error.message });
   }
 });
+
+router.put("/:id", (req, res) => {
+  // UPDATE posts SET title = 'new time', contents = 'the content'
+  // WHERE id = 5;
+  db("accounts")
+    .where({ id: req.params.id })
+    .update({
+      name: req.body.name,
+      budget: req.body.budget
+    })
+    .then(affectedRecords => {
+      console.log(affectedRecords);
+      res.json(affectedRecords + " records got changed!");
+    })
+    .catch(error => {
+      res.status(500).json({ message: "this went wrong: " + error.message });
+    });
+});
+
+router.delete("/:id", (req, res) => {
+  // DELETE FROM posts WHERE id = 1;
+  db("accounts")
+    .where({ id: req.params.id })
+    .del()
+    .then(affectedRows => {
+      res.json(affectedRows + " rows got deleted!!");
+    })
+    .catch(error => {
+      res.status(500).json("this went wrong: " + error.message);
+    });
+});
+
+module.exports = router;
