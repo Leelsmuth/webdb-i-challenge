@@ -6,7 +6,7 @@ SELECT * FROM Customers where PostalCode = '1010'
 ## Find the phone number for the supplier with the id 11
 SELECT Phone FROM Suppliers where SupplierID = 11
 
-## List first 10 orders ever places, descending by the order date
+## List first 10 orders ever placed, descending by the order date
 SELECT * FROM Orders order by OrderDate desc limit 10
 
 ## Find all customers that live in London, Madrid, or Brazil

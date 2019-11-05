@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", validateAccount, async (req, res) => {
   // INSERT INTO posts (name, accounts) VALUES ("a" , "b")
   try {
     const result = await db("accounts").insert({
@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", validateAccountId, (req, res) => {
   // UPDATE posts SET title = 'new time', contents = 'the content'
   // WHERE id = 5;
   db("accounts")
@@ -58,7 +58,7 @@ router.put("/:id", (req, res) => {
     });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", validateAccountId, (req, res) => {
   // DELETE FROM posts WHERE id = 1;
   db("accounts")
     .where({ id: req.params.id })
@@ -70,5 +70,40 @@ router.delete("/:id", (req, res) => {
       res.status(500).json("this went wrong: " + error.message);
     });
 });
+
+function validateAccount(req, res, next) {
+  let account = req.body;
+  if (!account) {
+    res.status(400).json({ message: "missing account data" });
+  } else if (!account.name) {
+    res.status(400).json({
+      message: "missing required name field for account record to be created"
+    });
+  } else if (!account.budget) {
+    res.status(400).json({
+      message: "missing required budget field for account record to be created"
+    });
+  } else {
+    next();
+  }
+}
+
+function validateAccountId(req, res, next) {
+  db("accounts")
+    .where({ id: req.params.id })
+    .then(account => {
+      if (account[0]) {
+        req.account = account;
+        next();
+      } else {
+        res.status(400).json({ message: "invalid account id" });
+      }
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: `Something terrible happend while checking account id: ${error.message}`
+      });
+    });
+}
 
 module.exports = router;
